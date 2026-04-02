@@ -1,7 +1,7 @@
 const CACHE_NAME = 'vi-turette-v1.0.1';
 const ASSETS_TO_CACHE = [
   './',
-  './index.html',
+  './VI-Turette.html',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png'
