@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1b4332">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>VI-Turette — Temps de trajet voiturette</title>
+<style>
+  /* ===== IMPORTS POLICES ===== */
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=MedievalSharp&family=UnifrakturCook:wght@700&display=swap');
+
+  /* ===== VARIABLES PAR DÉFAUT ===== */
+  :root {
+    --primary: #2d6a4f;
+    --primary-light: #40916c;
+    --primary-dark: #1b4332;
+    --accent: #d4a017;
+    --bg: #f0f4f0;
+    --card: #ffffff;
+    --text: #1b1b1b;
+    --text-light: #555;
+    --radius: 14px;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    --input-bg: #fafafa;
+    --input-border: #ddd;
+    --result-bg: #f8f9fa;
+    --location-bg: #e8f5e9;
+    --location-text: #1b4332;
+    --header-bg1: #1b4332;
+    --header-bg2: #2d6a4f;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --card-effect: none;
+    --body-after: none;
+  }
+
+  /* ===== THÈME ONYX ===== */
+  [data-theme="onyx"] {
+    --primary: #bb86fc; --primary-light: #cf9fff; --primary-dark: #9a67d9;
+    --accent: #03dac6; --bg: #121212; --card: #1e1e1e;
+    --text: #e0e0e0; --text-light: #aaa;
+    --shadow: 0 4px 20px rgba(0,0,0,0.5);
+    --input-bg: #2a2a2a; --input-border: #444;
+    --result-bg: #252525; --location-bg: #2a2a3a; --location-text: #bb86fc;
+    --header-bg1: #1a1a2e; --header-bg2: #2d2d44;
+  }
+
+  /* ===== THÈME ALBÂTRE ===== */
+  [data-theme="albatre"] {
+    --primary: #37474f; --primary-light: #546e7a; --primary-dark: #263238;
+    --accent: #ff6f00; --bg: #fafafa; --card: #fff;
+    --text: #212121; --text-light: #757575;
+    --input-bg: #fff; --input-border: #e0e0e0;
+    --result-bg: #f5f5f5; --location-bg: #e8eaf6; --location-text: #283593;
+    --header-bg1: #37474f; --header-bg2: #546e7a;
+  }
+
+  /* ===== THÈME SÉPIA ===== */
+  [data-theme="sepia"] {
+    --primary: #6d4c2a; --primary-light: #8d6e4a; --primary-dark: #4e3620;
+    --accent: #bf8030; --bg: #f5e6c8; --card: #faf0dc;
+    --text: #3e2723; --text-light: #6d5d4e;
+    --input-bg: #faf0dc; --input-border: #c9a96e;
+    --result-bg: #f0dbb8; --location-bg: #e8d5a8; --location-text: #4e3620;
+    --header-bg1: #4e3620; --header-bg2: #6d4c2a;
+  }
+
+  /* ===== THÈME OCÉANIQUE ===== */
+  [data-theme="oceanique"] {
+    --primary: #1a5276; --primary-light: #2980b9; --primary-dark: #0a2840;
+    --accent: #48c9b0; --bg: #0a1628; --card: #112240;
+    --text: #ccd6f6; --text-light: #8892b0;
+    --input-bg: #1a2f50; --input-border: #2a4a70;
+    --result-bg: #162d50; --location-bg: #1a3a5c; --location-text: #48c9b0;
+    --header-bg1: #061220; --header-bg2: #0a2240;
+  }
+
+  /* ===== THÈME SIDÉRAL ===== */
+  [data-theme="sideral"] {
+    --primary: #607d8b; --primary-light: #90a4ae; --primary-dark: #455a64;
+    --accent: #ff7043; --bg: #eceff1; --card: #fff;
+    --text: #263238; --text-light: #78909c;
+    --input-bg: #f5f5f5; --input-border: #cfd8dc;
+    --result-bg: #eceff1; --location-bg: #e0e0e0; --location-text: #37474f;
+    --header-bg1: #455a64; --header-bg2: #607d8b;
+  }
+
+  /* ===== THÈME NÉOMORPHISME ===== */
+  [data-theme="neomorphisme"] {
+    --primary: #6c63ff; --primary-light: #8b83ff; --primary-dark: #4d45b5;
+    --accent: #ff6584; --bg: #e0e5ec; --card: #e0e5ec;
+    --text: #2d3436; --text-light: #636e72;
+    --shadow: 8px 8px 16px #b8bec7, -8px -8px 16px #ffffff;
+    --input-bg: #e0e5ec; --input-border: transparent;
+    --result-bg: #e0e5ec; --location-bg: #d4dae3; --location-text: #4d45b5;
+    --header-bg1: #4d45b5; --header-bg2: #6c63ff;
+  }
+  [data-theme="neomorphisme"] .card {
+    box-shadow: 8px 8px 16px #b8bec7, -8px -8px 16px #ffffff;
+    border: none;
+  }
+  [data-theme="neomorphisme"] .input-group input {
+    box-shadow: inset 4px 4px 8px #b8bec7, inset -4px -4px 8px #ffffff;
+    border: none;
+  }
+  [data-theme="neomorphisme"] .result-row {
+    box-shadow: 4px 4px 10px #b8bec7, -4px -4px 10px #ffffff;
+  }
+
+  /* ===== THÈME GLASSMORPHISME ===== */
+  [data-theme="glassmorphisme"] {
+    --primary: #7c3aed; --primary-light: #a78bfa; --primary-dark: #5b21b6;
+    --accent: #f472b6; --bg: #667eea; --card: rgba(255,255,255,0.15);
+    --text: #ffffff; --text-light: rgba(255,255,255,0.75);
+    --shadow: 0 8px 32px rgba(0,0,0,0.2);
+    --input-bg: rgba(255,255,255,0.12); --input-border: rgba(255,255,255,0.25);
+    --result-bg: rgba(255,255,255,0.1); --location-bg: rgba(255,255,255,0.12);
+    --location-text: #e0e0ff;
+    --header-bg1: rgba(91,33,182,0.6); --header-bg2: rgba(124,58,237,0.6);
+  }
+  [data-theme="glassmorphisme"] body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  [data-theme="glassmorphisme"] .card,
+  [data-theme="glassmorphisme"] .settings-panel {
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  [data-theme="glassmorphisme"] .autocomplete-list {
+    background: rgba(40,20,80,0.85); backdrop-filter: blur(12px);
+    border-color: rgba(255,255,255,0.2);
+  }
+  [data-theme="glassmorphisme"] .autocomplete-item:hover { background: rgba(255,255,255,0.15); }
+
+  /* ===== THÈME CYBERPUNK ===== */
+  [data-theme="cyberpunk"] {
+    --primary: #ff006e; --primary-light: #ff4da6; --primary-dark: #c0005a;
+    --accent: #00f5d4; --bg: #0a0a0a; --card: #1a1a2e;
+    --text: #f0f0f0; --text-light: #aaa;
+    --shadow: 0 0 20px rgba(255,0,110,0.3);
+    --input-bg: #12122a; --input-border: #ff006e;
+    --result-bg: #14142e; --location-bg: #1a1a3e; --location-text: #00f5d4;
+    --header-bg1: #0a0a1a; --header-bg2: #1a1a2e;
+  }
+  [data-theme="cyberpunk"] header { border-bottom: 2px solid #ff006e; box-shadow: 0 4px 30px rgba(255,0,110,0.4); }
+  [data-theme="cyberpunk"] .card { border: 1px solid rgba(255,0,110,0.3); }
+  [data-theme="cyberpunk"] .btn-calculate { box-shadow: 0 0 20px rgba(255,0,110,0.5), 0 0 60px rgba(255,0,110,0.2); }
+  [data-theme="cyberpunk"] .result-row.highlight { box-shadow: 0 0 20px rgba(255,0,110,0.4); }
+  [data-theme="cyberpunk"] .autocomplete-list { background: #1a1a2e; border-color: #ff006e; }
+  [data-theme="cyberpunk"] .autocomplete-item:hover { background: rgba(255,0,110,0.15); }
+
+  /* ===== THÈME RÉTRO 8-BIT ===== */
+  [data-theme="retro8bit"] {
+    --primary: #306230; --primary-light: #8bac0f; --primary-dark: #0f380f;
+    --accent: #e0f868; --bg: #9bbc0f; --card: #8bac0f;
+    --text: #0f380f; --text-light: #306230;
+    --shadow: 4px 4px 0 #0f380f;
+    --radius: 0px;
+    --input-bg: #9bbc0f; --input-border: #306230;
+    --result-bg: #8bac0f; --location-bg: #7a9b00; --location-text: #0f380f;
+    --header-bg1: #0f380f; --header-bg2: #306230;
+    --font-body: 'Press Start 2P', monospace;
+  }
+  [data-theme="retro8bit"] * { font-family: 'Press Start 2P', monospace !important; }
+  [data-theme="retro8bit"] header h1 { font-size: 1rem !important; }
+  [data-theme="retro8bit"] header p { font-size: 0.5rem !important; }
+  [data-theme="retro8bit"] .card { border: 3px solid #0f380f; box-shadow: 4px 4px 0 #0f380f; }
+  [data-theme="retro8bit"] input { font-size: 0.65rem !important; border: 2px solid #0f380f !important; border-radius: 0 !important; }
+  [data-theme="retro8bit"] .btn-calculate { border-radius: 0; box-shadow: 4px 4px 0 #0f380f; font-size: 0.7rem !important; }
+  [data-theme="retro8bit"] .result-row { border-radius: 0; border: 2px solid #0f380f; }
+  [data-theme="retro8bit"] .autocomplete-list { border-radius: 0; border: 2px solid #0f380f; background: #8bac0f; }
+  [data-theme="retro8bit"] .theme-btn { font-size: 0.45rem !important; border-radius: 0 !important; }
+
+  /* ===== THÈME BAUHAUS ===== */
+  [data-theme="bauhaus"] {
+    --primary: #0051a2; --primary-light: #1a6fc4; --primary-dark: #003a75;
+    --accent: #fdc500; --bg: #f5f0e8; --card: #ffffff;
+    --text: #1a1a1a; --text-light: #555;
+    --input-bg: #fff; --input-border: #1a1a1a;
+    --result-bg: #f5f0e8; --location-bg: #e0ecf8; --location-text: #003a75;
+    --header-bg1: #dd1c1a; --header-bg2: #dd1c1a;
+  }
+  [data-theme="bauhaus"] .card { border: 3px solid #1a1a1a; border-radius: 0; }
+  [data-theme="bauhaus"] .btn-calculate { border-radius: 0; background: #dd1c1a; }
+  [data-theme="bauhaus"] header h1 span { color: #fdc500; }
+  [data-theme="bauhaus"] .dot-depart { background: #0051a2; }
+  [data-theme="bauhaus"] .dot-arrivee { background: #dd1c1a; }
+  [data-theme="bauhaus"] .result-row.highlight { background: #0051a2; }
+
+  /* ===== THÈME FORÊT DE PINS ===== */
+  [data-theme="foretpins"] {
+    --primary: #2d5a27; --primary-light: #4a7c3f; --primary-dark: #1a3a18;
+    --accent: #c8a96e; --bg: #1a2e1a; --card: #243824;
+    --text: #d4e4c8; --text-light: #a0b890;
+    --shadow: 0 4px 20px rgba(0,0,0,0.4);
+    --input-bg: #1e321e; --input-border: #3a5a3a;
+    --result-bg: #2a3e2a; --location-bg: #2a4a2a; --location-text: #c8a96e;
+    --header-bg1: #0e1e0e; --header-bg2: #1a3a18;
+  }
+
+  /* ===== THÈME AURORE BORÉALE ===== */
+  [data-theme="aurore"] {
+    --primary: #34e89e; --primary-light: #5ff0b5; --primary-dark: #1fb880;
+    --accent: #c471f5; --bg: #0f3443; --card: #1a4a5a;
+    --text: #e0f8f0; --text-light: #a0d8c8;
+    --shadow: 0 4px 30px rgba(52,232,158,0.15);
+    --input-bg: #163a4a; --input-border: #2a6a5a;
+    --result-bg: #1a4a5a; --location-bg: #1a5a5a; --location-text: #34e89e;
+    --header-bg1: #0a2a3a; --header-bg2: #1a4a5a;
+  }
+  [data-theme="aurore"] body { background: linear-gradient(180deg, #0f3443 0%, #1a4a5a 40%, #2a1a5a 100%); }
+  [data-theme="aurore"] header { background: linear-gradient(135deg, #0a2a3a, #1a3a6a, #2a1a5a) !important; }
+  [data-theme="aurore"] .btn-calculate { background: linear-gradient(135deg, #34e89e, #0f3443) !important; }
+  [data-theme="aurore"] .result-row.highlight { background: linear-gradient(135deg, #1a4a5a, #34e89e) !important; }
+
+  /* ===== THÈME DÉSERT SOLAIRE ===== */
+  [data-theme="desert"] {
+    --primary: #e76f51; --primary-light: #f4a261; --primary-dark: #c45a3c;
+    --accent: #264653; --bg: #faf3e8; --card: #fff8f0;
+    --text: #264653; --text-light: #6a8a7a;
+    --input-bg: #fef9f2; --input-border: #e4c9a0;
+    --result-bg: #f8eed8; --location-bg: #f0ddc0; --location-text: #c45a3c;
+    --header-bg1: #e76f51; --header-bg2: #f4a261;
+  }
+
+  /* ===== THÈME BANQUISE ===== */
+  [data-theme="banquise"] {
+    --primary: #3b8ea5; --primary-light: #5ab0c8; --primary-dark: #2a6a80;
+    --accent: #ff8a5c; --bg: #e8f4f8; --card: #f0faff;
+    --text: #1a3a4a; --text-light: #5a8a9a;
+    --input-bg: #f5fcff; --input-border: #b8dce8;
+    --result-bg: #e0f0f8; --location-bg: #d0eaf4; --location-text: #2a6a80;
+    --header-bg1: #2a6a80; --header-bg2: #3b8ea5;
+  }
+
+  /* ===== THÈME GRIMOIRE ===== */
+  [data-theme="grimoire"] {
+    --primary: #8b6914; --primary-light: #b8941e; --primary-dark: #5a4510;
+    --accent: #c0392b; --bg: #d4a96a; --card: #e8c888;
+    --text: #3e2723; --text-light: #5d4037;
+    --shadow: 0 4px 12px rgba(62,39,35,0.3);
+    --input-bg: #dbb870; --input-border: #8b6914;
+    --result-bg: #d4a96a; --location-bg: #c8982a; --location-text: #3e2723;
+    --header-bg1: #3e2723; --header-bg2: #5d4037;
+    --font-body: 'MedievalSharp', cursive;
+  }
+  [data-theme="grimoire"] body { font-family: 'MedievalSharp', cursive; }
+  [data-theme="grimoire"] .card { border: 2px solid #8b6914; box-shadow: 3px 3px 0 #5a4510; }
+  [data-theme="grimoire"] header h1 { font-family: 'UnifrakturCook', cursive; font-size: 2rem !important; }
+
+  /* ===== THÈME NÉBULEUSE ===== */
+  [data-theme="nebuleuse"] {
+    --primary: #c471f5; --primary-light: #d89eff; --primary-dark: #9b4dca;
+    --accent: #ff6fd8; --bg: #0b0c2a; --card: #1a1a3e;
+    --text: #e8e0f8; --text-light: #b0a0d0;
+    --shadow: 0 4px 30px rgba(196,113,245,0.2);
+    --input-bg: #14142e; --input-border: #3a2a6a;
+    --result-bg: #1a1a40; --location-bg: #2a1a5a; --location-text: #ff6fd8;
+    --header-bg1: #0b0c2a; --header-bg2: #302b63;
+  }
+  [data-theme="nebuleuse"] body { background: radial-gradient(ellipse at top, #302b63 0%, #0b0c2a 50%, #1a0a2e 100%); }
+  [data-theme="nebuleuse"] header { background: linear-gradient(135deg, rgba(48,43,99,0.8), rgba(26,10,46,0.8)) !important; }
+
+  /* ===== THÈME ABYSSAL ===== */
+  [data-theme="abyssal"] {
+    --primary: #0d4f6c; --primary-light: #1a8aaa; --primary-dark: #082a3a;
+    --accent: #00c9db; --bg: #0a1a2a; --card: #0e2a3e;
+    --text: #c0e8f0; --text-light: #70a8c0;
+    --shadow: 0 4px 20px rgba(0,201,219,0.1);
+    --input-bg: #0c2030; --input-border: #1a5a7a;
+    --result-bg: #0e2a3e; --location-bg: #0a3a5a; --location-text: #00c9db;
+    --header-bg1: #061220; --header-bg2: #0d4f6c;
+  }
+  [data-theme="abyssal"] body { background: linear-gradient(180deg, #0a1a2a 0%, #061830 50%, #0a2a3a 100%); }
+
+  /* ===== THÈME ALCHIMIE ===== */
+  [data-theme="alchimie"] {
+    --primary: #cd7f32; --primary-light: #daa520; --primary-dark: #8b6914;
+    --accent: #e0c068; --bg: #2a0a3e; --card: #3a1a4e;
+    --text: #f0dcc0; --text-light: #c0a080;
+    --shadow: 0 4px 20px rgba(205,127,50,0.2);
+    --input-bg: #2e1240; --input-border: #8b6914;
+    --result-bg: #321648; --location-bg: #3a1a5a; --location-text: #daa520;
+    --header-bg1: #1a0a2e; --header-bg2: #2a0a3e;
+  }
+  [data-theme="alchimie"] .card { border: 1px solid rgba(205,127,50,0.4); }
+  [data-theme="alchimie"] header { background: linear-gradient(135deg, #1a0a2e, #3a1a4e) !important; border-bottom: 2px solid #cd7f32; }
+  [data-theme="alchimie"] .btn-calculate { background: linear-gradient(135deg, #8b6914, #cd7f32) !important; }
+
+  /* ===== THÈME STEAMPUNK ===== */
+  [data-theme="steampunk"] {
+    --primary: #b87333; --primary-light: #d4944a; --primary-dark: #8b5a2a;
+    --accent: #c8a96e; --bg: #2c1810; --card: #3a2418;
+    --text: #e8d0b0; --text-light: #b8a080;
+    --shadow: 0 4px 16px rgba(0,0,0,0.4);
+    --input-bg: #321c12; --input-border: #8b5a2a;
+    --result-bg: #3a2418; --location-bg: #4a2e1c; --location-text: #d4944a;
+    --header-bg1: #1a0e08; --header-bg2: #2c1810;
+  }
+  [data-theme="steampunk"] .card { border: 2px solid #8b5a2a; border-radius: 4px; }
+  [data-theme="steampunk"] header { border-bottom: 3px solid #b87333; }
+  [data-theme="steampunk"] .btn-calculate { border-radius: 4px; background: linear-gradient(135deg, #8b5a2a, #b87333) !important; border: 2px solid #c8a96e; }
+
+  /* ===== THÈME OLYMPE ÉTERNEL ===== */
+  [data-theme="olympe"] {
+    --primary: #d4af37; --primary-light: #e8c84a; --primary-dark: #a08a28;
+    --accent: #8b7355; --bg: #f8f6f0; --card: #ffffff;
+    --text: #2a2420; --text-light: #7a7060;
+    --shadow: 0 4px 20px rgba(212,175,55,0.15);
+    --input-bg: #fefcf8; --input-border: #d4c8a0;
+    --result-bg: #faf5e8; --location-bg: #f0e8d0; --location-text: #8b6914;
+    --header-bg1: #f8f6f0; --header-bg2: #ece8d8;
+  }
+  [data-theme="olympe"] header { color: #2a2420 !important; border-bottom: 3px solid #d4af37; box-shadow: 0 4px 20px rgba(212,175,55,0.2); }
+  [data-theme="olympe"] header h1 { color: #2a2420; }
+  [data-theme="olympe"] header h1 span { color: #d4af37; }
+  [data-theme="olympe"] header p { color: #7a7060; }
+  [data-theme="olympe"] .settings-toggle { color: #d4af37; }
+  [data-theme="olympe"] .card { border: 1px solid rgba(212,175,55,0.3); }
+  [data-theme="olympe"] .btn-calculate { background: linear-gradient(135deg, #d4af37, #e8c84a) !important; color: #2a2420; }
+  [data-theme="olympe"] .result-row.highlight { background: linear-gradient(135deg, #d4af37, #a08a28) !important; }
+
+  /* ===== THÈME FORGE DU NAIN ===== */
+  [data-theme="forge"] {
+    --primary: #ff6600; --primary-light: #ff8833; --primary-dark: #cc5200;
+    --accent: #ffa040; --bg: #1a1210; --card: #2a1e18;
+    --text: #f0d0a0; --text-light: #b89060;
+    --shadow: 0 4px 20px rgba(255,102,0,0.2);
+    --input-bg: #221810; --input-border: #5c3a1e;
+    --result-bg: #2a1e18; --location-bg: #3a2818; --location-text: #ff8833;
+    --header-bg1: #0e0a08; --header-bg2: #1a1210;
+  }
+  [data-theme="forge"] header { border-bottom: 3px solid #ff6600; box-shadow: 0 4px 30px rgba(255,102,0,0.3); }
+  [data-theme="forge"] .card { border: 2px solid #5c3a1e; }
+  [data-theme="forge"] .btn-calculate {
+    background: linear-gradient(135deg, #cc5200, #ff6600) !important;
+    box-shadow: 0 0 20px rgba(255,102,0,0.4), 0 0 60px rgba(255,102,0,0.15);
+    border: 1px solid #ffa040;
+  }
+  [data-theme="forge"] .btn-calculate:hover { box-shadow: 0 0 30px rgba(255,102,0,0.6), 0 0 80px rgba(255,102,0,0.25); }
+  [data-theme="forge"] .result-row.highlight { background: linear-gradient(135deg, #5c3a1e, #ff6600) !important; box-shadow: 0 0 15px rgba(255,102,0,0.3); }
+
+  /* ===== THÈME CROISADE DE LUMIÈRE ===== */
+  [data-theme="croisade"] {
+    --primary: #4a80c4; --primary-light: #6a9fe0; --primary-dark: #1e3a6f;
+    --accent: #c0c0c0; --bg: #0a1a3f; --card: #122a5a;
+    --text: #d8e4f0; --text-light: #8aa0c0;
+    --shadow: 0 4px 20px rgba(74,128,196,0.2);
+    --input-bg: #0e2040; --input-border: #2a5090;
+    --result-bg: #142a5a; --location-bg: #1a3a6a; --location-text: #c0c0c0;
+    --header-bg1: #061030; --header-bg2: #1e3a6f;
+  }
+  [data-theme="croisade"] header { border-bottom: 2px solid #c0c0c0; }
+  [data-theme="croisade"] .card { border: 1px solid rgba(192,192,192,0.2); }
+  [data-theme="croisade"] .btn-calculate { background: linear-gradient(135deg, #1e3a6f, #4a80c4) !important; border: 1px solid #c0c0c0; }
+  [data-theme="croisade"] .result-row.highlight { background: linear-gradient(135deg, #1e3a6f, #4a80c4) !important; border: 1px solid rgba(192,192,192,0.3); }
+
+  /* ===== THÈME FORÊT DES DRUIDES ===== */
+  [data-theme="druides"] {
+    --primary: #4a8c3f; --primary-light: #6ab05a; --primary-dark: #2a5a1e;
+    --accent: #90b860; --bg: #0a1f0a; --card: #142e14;
+    --text: #c8e8b0; --text-light: #80a870;
+    --shadow: 0 4px 20px rgba(74,140,63,0.2);
+    --input-bg: #0e240e; --input-border: #2a5a1e;
+    --result-bg: #1a3a1a; --location-bg: #1e4a1e; --location-text: #90b860;
+    --header-bg1: #061006; --header-bg2: #0a1f0a;
+    --font-body: 'MedievalSharp', cursive;
+  }
+  [data-theme="druides"] body { font-family: 'MedievalSharp', cursive; }
+  [data-theme="druides"] header { background: linear-gradient(180deg, rgba(10,31,10,0.95), rgba(20,46,20,0.95)) !important; }
+  [data-theme="druides"] .card { border: 1px solid rgba(144,184,96,0.2); border-radius: 20px; }
+  [data-theme="druides"] .btn-calculate { background: linear-gradient(135deg, #2a5a1e, #4a8c3f) !important; border-radius: 30px; }
+
+  /* ===== THÈME CITADELLE DU VIDE ===== */
+  [data-theme="vide"] {
+    --primary: #8b5cf6; --primary-light: #a78bfa; --primary-dark: #6d28d9;
+    --accent: #c084fc; --bg: #0d0015; --card: #1a0a30;
+    --text: #e0d0f8; --text-light: #a080d0;
+    --shadow: 0 4px 30px rgba(139,92,246,0.15);
+    --input-bg: #140a24; --input-border: #3a1a6a;
+    --result-bg: #1a0a30; --location-bg: #2a1050; --location-text: #c084fc;
+    --header-bg1: #08000e; --header-bg2: #1a0a30;
+  }
+  [data-theme="vide"] body { background: radial-gradient(ellipse at center, #2a0845 0%, #0d0015 70%); }
+  [data-theme="vide"] header { background: rgba(13,0,21,0.8) !important; border-bottom: 1px solid rgba(139,92,246,0.3); box-shadow: 0 4px 30px rgba(139,92,246,0.2); }
+  [data-theme="vide"] .card { border: 1px solid rgba(139,92,246,0.15); box-shadow: 0 0 20px rgba(139,92,246,0.08); }
+  [data-theme="vide"] .btn-calculate {
+    background: linear-gradient(135deg, #6d28d9, #8b5cf6) !important;
+    box-shadow: 0 0 25px rgba(139,92,246,0.4), 0 0 80px rgba(139,92,246,0.15);
+  }
+  [data-theme="vide"] .result-row.highlight { background: linear-gradient(135deg, #6d28d9, #8b5cf6) !important; box-shadow: 0 0 20px rgba(139,92,246,0.3); }
+
+
+  /* ============================================= */
+  /* ========== STYLES STRUCTURELS BASE ========== */
+  /* ============================================= */
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background 0.4s, color 0.4s;
+  }
+
+  header {
+    width: 100%;
+    background: linear-gradient(135deg, var(--header-bg1), var(--header-bg2));
+    color: white;
+    text-align: center;
+    padding: 20px 16px 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    position: relative;
+    transition: background 0.4s;
+  }
+  header h1 { font-size: 1.7rem; font-weight: 800; letter-spacing: 1px; }
+  header h1 span { color: var(--accent); }
+  header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
+
+  /* ===== BOUTON PARAMÈTRES ===== */
+  .settings-toggle {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 50%;
+    width: 40px; height: 40px;
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s;
+    color: white;
+    backdrop-filter: blur(4px);
+  }
+  .settings-toggle:hover { background: rgba(255,255,255,0.25); transform: rotate(45deg); }
+
+  /* ===== OVERLAY ===== */
+  .settings-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 998;
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.25s;
+  }
+  .settings-overlay.active { display: block; }
+
+  /* ===== PANNEAU PARAMÈTRES ===== */
+  .settings-panel {
+    position: fixed;
+    top: 0; right: -380px;
+    width: 360px;
+    max-width: 90vw;
+    height: 100%;
+    background: var(--card);
+    color: var(--text);
+    z-index: 999;
+    box-shadow: -8px 0 40px rgba(0,0,0,0.3);
+    transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .settings-panel.active { right: 0; }
+
+  .settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--input-border);
+    flex-shrink: 0;
+  }
+  .settings-header h2 { font-size: 1.15rem; font-weight: 700; }
+  .settings-close {
+    background: none; border: none;
+    font-size: 1.4rem; cursor: pointer;
+    color: var(--text-light);
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .settings-close:hover { background: var(--result-bg); color: var(--text); }
+
+  .settings-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px 30px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .theme-category {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--primary);
+    margin: 20px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--input-border);
+  }
+  .theme-category:first-child { margin-top: 0; }
+
+  .theme-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .theme-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 10px;
+    background: var(--result-bg);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text);
+    transition: all 0.2s;
+    text-align: left;
+  }
+  .theme-btn:hover { border-color: var(--primary-light); transform: scale(1.02); }
+  .theme-btn.active { border-color: var(--primary); background: var(--location-bg); box-shadow: 0 0 0 1px var(--primary); }
+
+  .theme-preview {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* ===== STRUCTURE PRINCIPALE ===== */
+  main {
+    width: 100%;
+    max-width: 540px;
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
+    transition: background 0.4s, box-shadow 0.4s;
+  }
+
+  .card-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--primary);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .dot-depart { background: var(--primary); }
+  .dot-arrivee { background: #c0392b; }
+
+  .input-group {
+    position: relative;
+    margin-bottom: 10px;
+  }
+  .input-group:last-child { margin-bottom: 0; }
+
+  .input-group input {
+    width: 100%;
+    padding: 12px 14px;
+    padding-right: 52px;
+    border: 2px solid var(--input-border);
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: border-color 0.2s, background 0.3s;
+    background: var(--input-bg);
+    color: var(--text);
+  }
+  .input-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--input-bg);
+  }
+
+  .btn-geo {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 40px;
+    height: 36px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+  }
+  .btn-geo:hover { background: var(--primary-light); }
+  .btn-geo:active { transform: translateY(-50%) scale(0.95); }
+
+  .autocomplete-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--card);
+    border: 2px solid var(--primary-light);
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100;
+    display: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  }
+  .autocomplete-list.active { display: block; }
+  .autocomplete-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--input-border);
+    transition: background 0.15s;
+    color: var(--text);
+  }
+  .autocomplete-item:hover { background: var(--location-bg); }
+  .autocomplete-item:last-child { border-bottom: none; }
+
+  .location-info {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: var(--location-bg);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    color: var(--location-text);
+    display: none;
+    line-height: 1.5;
+    transition: background 0.4s, color 0.4s;
+  }
+  .location-info.visible { display: block; }
+  .location-info strong { font-weight: 600; }
+
+  .btn-calculate {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(45,106,79,0.3);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-calculate:hover { transform: translateY(-1px); }
+  .btn-calculate:active { transform: translateY(0); }
+  .btn-calculate:disabled { opacity: 0.6; cursor: wait; transform: none; }
+
+  .spinner {
+    display: none;
+    width: 20px; height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  .spinner.active { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .btn-label.hidden { display: none; }
+
+  .results {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .results.visible { display: flex; }
+
+  .result-distance {
+    text-align: center;
+    padding: 14px;
+    background: var(--result-bg);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: var(--text-light);
+    transition: background 0.4s;
+  }
+  .result-distance strong {
+    font-size: 1.3rem;
+    color: var(--text);
+    display: block;
+    margin-top: 2px;
+  }
+
+  .result-row {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    border-radius: 12px;
+    gap: 12px;
+    background: var(--result-bg);
+    transition: all 0.3s;
+  }
+  .result-row.highlight {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    color: white;
+    box-shadow: 0 4px 16px rgba(45,106,79,0.25);
+  }
+  .result-icon { font-size: 1.5rem; flex-shrink: 0; }
+  .result-info { flex: 1; }
+  .result-speed { font-size: 0.8rem; opacity: 0.8; }
+  .result-time { font-size: 1.3rem; font-weight: 800; }
+  .result-row.highlight .result-speed { opacity: 0.9; }
+  .result-note {
+    font-size: 0.75rem;
+    text-align: center;
+    color: var(--text-light);
+    font-style: italic;
+    padding: 4px 0;
+  }
+
+  .swap-btn {
+    align-self: center;
+    background: var(--card);
+    border: 2px solid var(--input-border);
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    margin: -6px 0;
+    z-index: 10;
+    transition: all 0.2s;
+    box-shadow: var(--shadow);
+  }
+  .swap-btn:hover { border-color: var(--primary); background: var(--location-bg); }
+
+  footer {
+    text-align: center;
+    padding: 12px;
+    font-size: 0.7rem;
+    color: var(--text-light);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <button class="settings-toggle" onclick="toggleSettings()" title="Paramètres" aria-label="Paramètres">⚙️</button>
+  <h1>VI-<span>Turette</span> 🚗</h1>
+  <p>Temps de trajet réaliste — Voiture & Voiturette Sans Permis</p>
+</header>
+
+<!-- PANNEAU PARAMÈTRES — juste après </header>, avant <main> -->
+<div class="settings-overlay" id="settings-overlay" onclick="toggleSettings()"></div>
+<div class="settings-panel" id="settings-panel">
+  <div class="settings-header">
+    <h2>⚙️ Paramètres</h2>
+    <button class="settings-close" onclick="toggleSettings()">✕</button>
+  </div>
+  <div class="settings-body">
+    <div class="theme-category">🎨 Classiques & Ergonomiques</div>
+    <div class="theme-grid">
+      <button class="theme-btn active" data-theme="default" onclick="setTheme('default')"><span class="theme-preview" style="background:linear-gradient(135deg,#2d6a4f,#40916c)"></span>Forêt (Défaut)</button>
+      <button class="theme-btn" data-theme="onyx" onclick="setTheme('onyx')"><span class="theme-preview" style="background:linear-gradient(135deg,#1a1a2e,#bb86fc)"></span>Onyx (Sombre)</button>
+      <button class="theme-btn" data-theme="albatre" onclick="setTheme('albatre')"><span class="theme-preview" style="background:linear-gradient(135deg,#fafafa,#37474f)"></span>Albâtre (Clair)</button>
+      <button class="theme-btn" data-theme="sepia" onclick="setTheme('sepia')"><span class="theme-preview" style="background:linear-gradient(135deg,#f5e6c8,#6d4c2a)"></span>Sépia</button>
+      <button class="theme-btn" data-theme="oceanique" onclick="setTheme('oceanique')"><span class="theme-preview" style="background:linear-gradient(135deg,#0a1628,#1a5276)"></span>Bleu Nuit</button>
+      <button class="theme-btn" data-theme="sideral" onclick="setTheme('sideral')"><span class="theme-preview" style="background:linear-gradient(135deg,#2c3e50,#95a5a6)"></span>Gris Sidéral</button>
+    </div>
+    <div class="theme-category">✨ Esthétiques Modernes</div>
+    <div class="theme-grid">
+      <button class="theme-btn" data-theme="neomorphisme" onclick="setTheme('neomorphisme')"><span class="theme-preview" style="background:linear-gradient(135deg,#e0e5ec,#c8cfd8)"></span>Néomorphisme</button>
+      <button class="theme-btn" data-theme="glassmorphisme" onclick="setTheme('glassmorphisme')"><span class="theme-preview" style="background:linear-gradient(135deg,#667eea,#764ba2)"></span>Glassmorphisme</button>
+      <button class="theme-btn" data-theme="cyberpunk" onclick="setTheme('cyberpunk')"><span class="theme-preview" style="background:linear-gradient(135deg,#0a0a0a,#ff006e,#8338ec)"></span>Cyberpunk</button>
+      <button class="theme-btn" data-theme="retro8bit" onclick="setTheme('retro8bit')"><span class="theme-preview" style="background:linear-gradient(135deg,#306230,#8bac0f)"></span>Rétro 8-bit</button>
+      <button class="theme-btn" data-theme="bauhaus" onclick="setTheme('bauhaus')"><span class="theme-preview" style="background:linear-gradient(135deg,#dd1c1a,#0051a2,#fdc500)"></span>Bauhaus</button>
+    </div>
+    <div class="theme-category">🌿 Nature & Sérénité</div>
+    <div class="theme-grid">
+      <button class="theme-btn" data-theme="foretpins" onclick="setTheme('foretpins')"><span class="theme-preview" style="background:linear-gradient(135deg,#1a2e1a,#2d5a27)"></span>Forêt de Pins</button>
+      <button class="theme-btn" data-theme="aurore" onclick="setTheme('aurore')"><span class="theme-preview" style="background:linear-gradient(135deg,#0f3443,#34e89e,#6b2fa0)"></span>Aurore Boréale</button>
+      <button class="theme-btn" data-theme="desert" onclick="setTheme('desert')"><span class="theme-preview" style="background:linear-gradient(135deg,#f4a261,#e76f51,#264653)"></span>Désert Solaire</button>
+      <button class="theme-btn" data-theme="banquise" onclick="setTheme('banquise')"><span class="theme-preview" style="background:linear-gradient(135deg,#e8f4f8,#a8d8ea,#3b8ea5)"></span>Banquise</button>
+    </div>
+    <div class="theme-category">🐉 Fantastiques & Surprenants</div>
+    <div class="theme-grid">
+      <button class="theme-btn" data-theme="grimoire" onclick="setTheme('grimoire')"><span class="theme-preview" style="background:linear-gradient(135deg,#d4a96a,#8b6914,#3e2723)"></span>Grimoire Ancien</button>
+      <button class="theme-btn" data-theme="nebuleuse" onclick="setTheme('nebuleuse')"><span class="theme-preview" style="background:linear-gradient(135deg,#0b0c2a,#302b63,#ff6fd8)"></span>Nébuleuse</button>
+      <button class="theme-btn" data-theme="abyssal" onclick="setTheme('abyssal')"><span class="theme-preview" style="background:linear-gradient(135deg,#0a1a2a,#0d4f6c,#00c9db)"></span>Abyssal</button>
+      <button class="theme-btn" data-theme="alchimie" onclick="setTheme('alchimie')"><span class="theme-preview" style="background:linear-gradient(135deg,#2a0a3e,#b8860b,#cd7f32)"></span>Alchimie</button>
+      <button class="theme-btn" data-theme="steampunk" onclick="setTheme('steampunk')"><span class="theme-preview" style="background:linear-gradient(135deg,#2c1810,#b87333,#8b7355)"></span>Steampunk</button>
+    </div>
+    <div class="theme-category">⚔️ Épiques & Légendaires</div>
+    <div class="theme-grid">
+      <button class="theme-btn" data-theme="olympe" onclick="setTheme('olympe')"><span class="theme-preview" style="background:linear-gradient(135deg,#f8f6f0,#d4af37,#ffffff)"></span>Olympe Éternel</button>
+      <button class="theme-btn" data-theme="forge" onclick="setTheme('forge')"><span class="theme-preview" style="background:linear-gradient(135deg,#1a1210,#5c3a1e,#ff6600)"></span>Forge du Nain</button>
+      <button class="theme-btn" data-theme="croisade" onclick="setTheme('croisade')"><span class="theme-preview" style="background:linear-gradient(135deg,#0a1a3f,#1e3a6f,#c0c0c0)"></span>Croisade de Lumière</button>
+      <button class="theme-btn" data-theme="druides" onclick="setTheme('druides')"><span class="theme-preview" style="background:linear-gradient(135deg,#0a1f0a,#2d5a1e,#90b860)"></span>Forêt des Druides</button>
+      <button class="theme-btn" data-theme="vide" onclick="setTheme('vide')"><span class="theme-preview" style="background:linear-gradient(135deg,#0d0015,#2a0845,#6b2fa0)"></span>Citadelle du Vide</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <!-- DÉPART -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-depart"></span> Point de départ</div>
+    <div class="input-group">
+      <input type="text" id="input-depart" placeholder="Adresse, ville ou coordonnées GPS" autocomplete="off" aria-label="Point de départ">
+      <button class="btn-geo" onclick="geolocate('depart')" title="Ma position" aria-label="Utiliser ma position GPS">📍</button>
+      <div class="autocomplete-list" id="ac-depart"></div>
+    </div>
+    <div class="location-info" id="info-depart"></div>
+  </div>
+
+  <!-- BOUTON INVERSER -->
+  <button class="swap-btn" onclick="swapPoints()" title="Inverser départ / arrivée" aria-label="Inverser">⇅</button>
+
+  <!-- ARRIVÉE -->
+  <div class="card">
+    <div class="card-title"><span class="dot dot-arrivee"></span> Point d'arrivée</div>
+    <div class="input-group">
+      <input type="text" id="input-arrivee" placeholder="Adresse, ville ou coordonnées GPS" autocomplete="off" aria-label="Point d'arrivée">
+      <button class="btn-geo" onclick="geolocate('arrivee')" title="Ma position" aria-label="Utiliser ma position GPS">📍</button>
+      <div class="autocomplete-list" id="ac-arrivee"></div>
+    </div>
+    <div class="location-info" id="info-arrivee"></div>
+  </div>
+
+  <!-- BOUTON CALCULER -->
+  <button class="btn-calculate" id="btn-calc" onclick="calculate()">
+    <span class="btn-label">Calculer le temps de trajet</span>
+    <div class="spinner" id="calc-spinner"></div>
+  </button>
+
+  <!-- RÉSULTATS -->
+  <div class="card results" id="results">
+    <div class="result-distance">
+      Distance par la route<strong id="res-distance"></strong>
+    </div>
+
+    <div class="result-row highlight">
+      <div class="result-icon">🛵</div>
+      <div class="result-info">
+        <div class="result-speed">45 km/h — Voiturette</div>
+        <div class="result-time" id="res-45"></div>
+      </div>
+    </div>
+
+    <div class="result-row">
+      <div class="result-icon">🚗</div>
+      <div class="result-info">
+        <div class="result-speed">80 km/h</div>
+        <div class="result-time" id="res-80"></div>
+      </div>
+    </div>
+
+    <div class="result-row">
+      <div class="result-icon">🚗</div>
+      <div class="result-info">
+        <div class="result-speed">90 km/h</div>
+        <div class="result-time" id="res-90"></div>
+      </div>
+    </div>
+
+    <div class="result-note" id="res-note"></div>
+  </div>
+</main>
+
+<footer>VI-Turette — Données OpenStreetMap & OSRM - ©2026 LEROY Aurélien - Tous droits réservés - Version 1.0.1</footer>
+
+<script>
+  const state = {
+    depart: { lat: null, lon: null, display: '', address: null },
+    arrivee: { lat: null, lon: null, display: '', address: null }
+  };
+
+  const debounceTimers = {};
+
+  // ==================== AUTOCOMPLÉTION ====================
+  function setupAutocomplete(type) {
+    const input = document.getElementById(`input-${type}`);
+    const list = document.getElementById(`ac-${type}`);
+
+    input.addEventListener('input', () => {
+      const q = input.value.trim();
+      clearTimeout(debounceTimers[type]);
+
+      if (q.length < 3) { list.classList.remove('active'); return; }
+
+      // Détection coordonnées GPS
+      const gpsMatch = q.match(/^(-?\d+\.?\d*)\s*[,;\s]\s*(-?\d+\.?\d*)$/);
+      if (gpsMatch) {
+        const lat = parseFloat(gpsMatch[1]);
+        const lon = parseFloat(gpsMatch[2]);
+        if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+          list.classList.remove('active');
+          reverseGeocode(lat, lon, type);
+          return;
+        }
+      }
+
+      debounceTimers[type] = setTimeout(() => searchPlace(q, type), 350);
+    });
+
+    input.addEventListener('focus', () => {
+      if (list.children.length > 0) list.classList.add('active');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest(`#ac-${type}`) && e.target !== input) {
+        list.classList.remove('active');
+      }
+    });
+  }
+
+  async function searchPlace(query, type) {
+    const list = document.getElementById(`ac-${type}`);
+    try {
+      const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1&countrycodes=fr,be,ch,lu`);
+      const data = await r.json();
+      list.innerHTML = '';
+      if (!data.length) { list.classList.remove('active'); return; }
+
+      data.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'autocomplete-item';
+        div.textContent = item.display_name;
+        div.addEventListener('click', () => {
+          selectPlace(type, item);
+          list.classList.remove('active');
+        });
+        list.appendChild(div);
+      });
+      list.classList.add('active');
+    } catch (e) { console.error(e); }
+  }
+
+  function selectPlace(type, item) {
+    state[type].lat = parseFloat(item.lat);
+    state[type].lon = parseFloat(item.lon);
+    state[type].display = item.display_name;
+    state[type].address = item.address || null;
+
+    document.getElementById(`input-${type}`).value = item.display_name;
+    showLocationInfo(type, item.address, item.display_name);
+  }
+
+  function showLocationInfo(type, address, display) {
+    const el = document.getElementById(`info-${type}`);
+    if (!address) {
+      el.textContent = display;
+      el.classList.add('visible');
+      return;
+    }
+    const parts = [];
+    if (address.road) parts.push(`<strong>📍 ${address.road}${address.house_number ? ' ' + address.house_number : ''}</strong>`);
+    if (address.postcode || address.city || address.town || address.village || address.municipality) {
+      const ville = address.city || address.town || address.village || address.municipality || '';
+      parts.push(`🏘️ ${address.postcode || ''} ${ville}`.trim());
+    }
+    if (address.county) parts.push(`📌 ${address.county}`);
+    if (address.state) parts.push(`🗺️ ${address.state}`);
+
+    el.innerHTML = parts.length ? parts.join('<br>') : display;
+    el.classList.add('visible');
+  }
+
+  // ==================== GÉOLOCALISATION ====================
+  function geolocate(type) {
+    if (!navigator.geolocation) {
+      alert('La géolocalisation n\'est pas disponible sur cet appareil.');
+      return;
+    }
+    const input = document.getElementById(`input-${type}`);
+    input.value = '⏳ Localisation en cours...';
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => reverseGeocode(pos.coords.latitude, pos.coords.longitude, type),
+      (err) => {
+        input.value = '';
+        alert('Impossible d\'obtenir votre position. Vérifiez vos paramètres de localisation.');
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
+
+  async function reverseGeocode(lat, lon, type) {
+    try {
+      const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`);
+      const data = await r.json();
+      state[type].lat = lat;
+      state[type].lon = lon;
+      state[type].display = data.display_name || `${lat}, ${lon}`;
+      state[type].address = data.address || null;
+      document.getElementById(`input-${type}`).value = state[type].display;
+      showLocationInfo(type, data.address, state[type].display);
+    } catch (e) {
+      state[type].lat = lat;
+      state[type].lon = lon;
+      document.getElementById(`input-${type}`).value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+    }
+  }
+
+  // ==================== INVERSER ====================
+  function swapPoints() {
+    const tmp = { ...state.depart };
+    Object.assign(state.depart, state.arrivee);
+    Object.assign(state.arrivee, tmp);
+
+    document.getElementById('input-depart').value = state.depart.display || '';
+    document.getElementById('input-arrivee').value = state.arrivee.display || '';
+
+    const infoD = document.getElementById('info-depart');
+    const infoA = document.getElementById('info-arrivee');
+    const tmpHtml = infoD.innerHTML;
+    const tmpVis = infoD.classList.contains('visible');
+    infoD.innerHTML = infoA.innerHTML;
+    infoD.classList.toggle('visible', infoA.classList.contains('visible'));
+    infoA.innerHTML = tmpHtml;
+    infoA.classList.toggle('visible', tmpVis);
+  }
+
+  // ==================== CALCUL RÉALISTE ====================
+  async function calculate() {
+    if (!state.depart.lat || !state.arrivee.lat) {
+      alert('Veuillez renseigner le point de départ et le point d\'arrivée.');
+      return;
+    }
+
+    const btn = document.getElementById('btn-calc');
+    const label = btn.querySelector('.btn-label');
+    const spinner = document.getElementById('calc-spinner');
+    const resultsEl = document.getElementById('results');
+
+    btn.disabled = true;
+    label.classList.add('hidden');
+    spinner.classList.add('active');
+    resultsEl.classList.remove('visible');
+
+    try {
+      // Requête OSRM avec steps pour analyser chaque segment de route
+      const coords = `${state.depart.lon},${state.depart.lat};${state.arrivee.lon},${state.arrivee.lat}`;
+      const url = `https://router.project-osrm.org/route/v1/driving/${coords}?overview=false&steps=true`;
+      const r = await fetch(url);
+      const data = await r.json();
+
+      if (!data.routes || !data.routes.length) {
+        alert('Aucun itinéraire trouvé entre ces deux points.');
+        return;
+      }
+
+      const route = data.routes[0];
+      const distanceKm = route.distance / 1000;
+
+      // Analyse segment par segment
+      let totalTime45 = 0;
+      let totalTime80 = 0;
+      let totalTime90 = 0;
+
+      for (const leg of route.legs) {
+        for (const step of leg.steps) {
+          const stepDistKm = step.distance / 1000;
+          const stepDurationH = step.duration / 3600; // durée OSRM en heures
+
+          if (stepDistKm < 0.001 || stepDurationH < 0.00001) continue;
+
+          // Vitesse estimée OSRM pour ce segment (km/h)
+          const osrmSpeed = stepDistKm / stepDurationH;
+
+          // === VOITURETTE 45 km/h ===
+          // Plafonnée à 45 km/h max, mais respecte les zones lentes
+          const speed45 = Math.min(osrmSpeed, 45);
+          totalTime45 += stepDistKm / speed45;
+
+          // === VOITURE 80 km/h ===
+          // Sur segments rapides (>80), on plafonne à 80. Sur segments lents, on garde la vitesse OSRM
+          const speed80 = Math.min(osrmSpeed, 80);
+          totalTime80 += stepDistKm / speed80;
+
+          // === VOITURE 90 km/h ===
+          const speed90 = Math.min(osrmSpeed, 90);
+          totalTime90 += stepDistKm / speed90;
+        }
+      }
+
+      // Facteur réaliste pour arrêts, feux, ronds-points, accélérations
+      // OSRM inclut déjà une partie de ces ralentissements dans ses vitesses de segments,
+      // mais on ajoute un petit facteur pour les micro-arrêts non modélisés
+      const realism = 1.12; // +12% pour feux, stops, hésitations réelles
+
+      totalTime45 *= realism;
+      totalTime80 *= realism;
+      totalTime90 *= realism;
+
+      // Affichage
+      document.getElementById('res-distance').textContent = distanceKm < 1
+        ? `${Math.round(distanceKm * 1000)} m`
+        : `${distanceKm.toFixed(1)} km`;
+
+      document.getElementById('res-45').textContent = formatDuration(totalTime45);
+      document.getElementById('res-80').textContent = formatDuration(totalTime80);
+      document.getElementById('res-90').textContent = formatDuration(totalTime90);
+
+      document.getElementById('res-note').textContent =
+        '⏱️ Temps estimés incluant ralentissements en ville, feux et intersections';
+
+      resultsEl.classList.add('visible');
+      resultsEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    } catch (e) {
+      alert('Erreur de connexion. Vérifiez votre réseau et réessayez.');
+      console.error(e);
+    } finally {
+      btn.disabled = false;
+      label.classList.remove('hidden');
+      spinner.classList.remove('active');
+    }
+  }
+
+  function formatDuration(hours) {
+    const totalMin = Math.round(hours * 60);
+    if (totalMin < 1) return '< 1 min';
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    if (h === 0) return `${m} min`;
+    return `${h}h ${m.toString().padStart(2, '0')} min`;
+  }
+
+    // ===== SYSTÈME DE THÈMES =====
+  function toggleSettings() {
+    document.getElementById('settings-overlay').classList.toggle('active');
+    document.getElementById('settings-panel').classList.toggle('active');
+  }
+
+  function setTheme(themeName) {
+    if (themeName === 'default') {
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', themeName);
+    }
+    // Mettre à jour le bouton actif
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.theme === themeName);
+    });
+    // Sauvegarder
+    localStorage.setItem('vi-turette-theme', themeName);
+  }
+
+  // Charger le thème sauvegardé
+  (function() {
+    const saved = localStorage.getItem('vi-turette-theme');
+    if (saved && saved !== 'default') {
+      setTheme(saved);
+    }
+  })();
+
+  // Fermer le panneau avec Echap
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.getElementById('settings-overlay').classList.remove('active');
+      document.getElementById('settings-panel').classList.remove('active');
+    }
+  });
+
+  // Init
+  setupAutocomplete('depart');
+  setupAutocomplete('arrivee');
+
+
+  // ===== ENREGISTREMENT SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('SW enregistré:', reg.scope))
+      .catch(err => console.log('SW erreur:', err));
+  });
+}
+
+</script>
+</body>
+</html>
