@@ -2,7 +2,7 @@
   "name": "VI-Turette — Temps de trajet voiturette",
   "short_name": "VI-Turette",
   "description": "Calculez vos temps de trajet réalistes pour voiture et voiturette sans permis.",
-  "start_url": "./VI-Turette.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f0f4f0",
